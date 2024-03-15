@@ -1,6 +1,8 @@
 '''
 example:
-    python3 erna/manage.py shell < erna/scripts/p15_mirnaseq_long_iterative.py
+    python3 erna/manage.py shell < erna/scripts/p5_mirnaseq_long_iterative.py
+example of run tasks:
+    python3 erna/erna_app.py -m execute_tasks -p P0005 -c
 '''
 from rna_seq.models import *
 from commons.models import CustomUser
@@ -8,7 +10,7 @@ from commons.models import CustomUser
 user = CustomUser.objects.get(pk=1)
 
 print("Cretae project...") 
-project_id = "P00015"
+project_id = "P00005"
 project_data = {
     "project_name": "test_iterative_mirna_seq",
     "description": "test miRNA-seq pipeline",

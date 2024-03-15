@@ -10,30 +10,7 @@ TOOL_EXE = {
     'fastqc': [
         {'name': 'fastqc',},
     ],
-    'hisat2': [
-        {'name': 'hisat2',},
-        {'name': 'hisat2-build',},
-        {'name': 'hisat2-inspect'},
-    ],
-    'minimap2': [
-        {'name': 'minimap2',},
-    ],
     'samtools': [
         {'name': 'samtools',},
-    ],
-    'stringtie': [
-        {'name': 'stringtie',},
-    ],
-    'tophat': [
-        {'name': 'tophat',},
-    ],
-    'star': [
-        {
-            'name': 'STAR',
-            'params': {
-                '--sjdbOverhang': '99',
-                '--runTreadN': '6',
-            },
-        },
     ],
 }

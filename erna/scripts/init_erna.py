@@ -31,18 +31,6 @@ for enter in range(start, end+1):
 
     # TODO: confirm function
     if enter == 5:
-        print('import default pipelines of mRNA-Seq...')
-        mrna_seq = [
-            ("build_genome_index", 'hisat2-build', None),
-            ("align_transcriptome", 'hisat2', None),
-            ("convert_format", 'samtools', None),
-            ("assemble_transcripts", 'stringtie', None), 
-            ("merge_transcripts", 'stringtie', None), 
-            ("count_reads", None, None),
-        ]
-        Pipeline.objects.filter(pipeline_name='mRNA-Seq').delete()
-        steps = Pipeline.objects.load_pipeline('mRNA-Seq', mrna_seq)
-
         print('import default pipelines of miRNA-Seq...')
         mirna_seq = [
             ("build_index", 'bowtie2-build', None),
