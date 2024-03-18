@@ -1,5 +1,4 @@
 from .align import Align
-from .assemble import Assemble
 
 from .collect import Collect
 from .count import Count

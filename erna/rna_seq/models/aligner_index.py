@@ -38,6 +38,7 @@ class AlignerIndexManager(models.Manager):
     res = []
     indexes = self.scan_index_dir()
     for digit_name, info in indexes:
+      print(info)
       this_model = getattr(rna_seq.models, info['model_name'])
       defaults = {
         'tool': Tool.objects.get(**info['tool_query']),

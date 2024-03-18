@@ -116,49 +116,6 @@ class Align:
     return None
 
 
-  def build_genome_index(self):
-    '''
-    build index for genome alignment
-    annotations are stored in model Annotation
-    '''
-    tool = self.params.get('tool')
-    if tool is None:
-      return None
-    genome_annot = self.params.get('genome_annot')
-    if genome_annot is None or not genome_annot.get('dna'):
-      return None
-
-    meta_data = {
-      'fa_path': genome_annot['dna'].file_path,
-      'gtf_path': genome_annot['gff'].file_path,
-      'index_path': genome_annot['dna'].get_index_path(tool),
-      'model_name': 'Annotation',
-      'model_query': {
-        'file_path': genome_annot['dna'].file_path,
-      },
-      'tool_query': {
-        'exe_name': tool.exe_name,
-        'version': tool.version,
-      },
-    }
-
-    # build index
-    if not meta_data['index_path']:
-      new_index = AlignerIndex.objects.new_index(tool, genome_annot['dna'], meta_data)
-      if tool.tool_name == 'star':
-        self.params['cmd'] = ProcessCMD.star_build_index(tool, meta_data)
-      else:
-        self.params['cmd'] = ProcessCMD.aligner_build_index(tool, meta_data)
-      Process.run_subprocess(self.params)
-      new_index.update_index(meta_data)
-      
-    # update Task
-    self.params['output'].append(meta_data)
-    for child_task in self.params['children']:
-      child_task.update_params(meta_data)
-    return None
-
-
   '''
   sequence alignment
   '''
@@ -179,12 +136,8 @@ class Align:
 
       # build CMD
       exe_name = self.params['tool'].exe_name
-      if exe_name == 'hisat2':
-        self.params['cmd'] = ProcessCMD.hisat2_align(tool, meta_data)
-      elif exe_name == 'bowtie2':
+      if exe_name == 'bowtie2':
         self.params['cmd'] = ProcessCMD.bowtie2_align(tool, meta_data)
-      elif exe_name == 'STAR':
-        self.params['cmd'] = ProcessCMD.star_align(tool, meta_data)
 
       # run process
       Process.run_subprocess(self.params)

@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'rna_seq',
     'api',
     'commons',
-    'help',
 ]
 
 MIDDLEWARE = [
@@ -107,5 +106,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 

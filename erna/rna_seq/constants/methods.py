@@ -5,6 +5,13 @@ ROOT_METHOD = {
 
 GENERAL_METHODS = [
   {
+    "method_name": "trim_sequences",
+    "description": "miRNA-seq",
+    "child_method": ["align_short_reads",],
+    "exe_name": [],
+    "default_params": {'adapter_3end': 'TGGAATTCTCGGGTGCCAAGG',},
+  },
+  {
     "method_name": "align_short_reads",
     "description": "",
     "child_method": ["count_reads", "convert_format",],
@@ -13,14 +20,8 @@ GENERAL_METHODS = [
   {
     "method_name": "build_index",
     "description": "build index for sequencing alignment",
-    "child_method": [
-        # "align_long_reads",
-        "align_short_reads",
-    ],
-    "exe_name": [
-        # "bowtie1-build",
-        "bowtie2-build",
-    ],
+    "child_method": ["align_short_reads",],
+    "exe_name": ["bowtie2-build",],
   },
   {
     "method_name": "count_reads",
@@ -33,13 +34,6 @@ GENERAL_METHODS = [
     "description": "count reads for differential expression",
     "child_method": [],
     "exe_name": [],
-  },
-  {
-    "method_name": "trim_sequences",
-    "description": "miRNA-seq",
-    "child_method": ["align_short_reads",],
-    "exe_name": [],
-    "default_params": {'adapter_3end': 'TGGAATTCTCGGGTGCCAAGG',},
   },
   {
     "method_name": "quality_control",

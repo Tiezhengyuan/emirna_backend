@@ -24,6 +24,5 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('rna_seq/', include('rna_seq.urls')),
     path('celery_tasks/', include('celery_tasks.urls')),
-    path('help/', include('help.urls')),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 

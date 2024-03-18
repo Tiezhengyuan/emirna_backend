@@ -1,8 +1,8 @@
 '''
 example:
-    python3 erna/manage.py shell < erna/scripts/p5_mirnaseq_long_iterative.py
+    python3 erna/manage.py shell < erna/scripts/p5_long_iterative.py
 example of run tasks:
-    python3 erna/erna_app.py -m execute_tasks -p P0005 -c
+    python3 erna/erna_app.py -m execute_tasks -p P00005 -c
 '''
 from rna_seq.models import *
 from commons.models import CustomUser
@@ -36,9 +36,7 @@ batch_names = ['miRNA_2023',]
 sample_files = SampleFile.objects.parse_sample_rawdata([study_name,], batch_names)
 
 print('Update SampleProject...')
-res = SampleProject.objects.load_project_sample_files(
-    project_id, [s.id for s,_ in sample_files]
-)
+res = SampleProject.objects.load_data(project_id, sample_data)
 print(res)
 
 print('Add tasks...')
@@ -215,9 +213,7 @@ tasks_data = [
         'tool': builder,
         'params': {
             'model': 'MolecularAnnotation',
-            'query': {
-                "file_path": "/home/yuan/bio/references/NCBI/genome/Homo_sapiens/GCF_000001405.40/features/mRNA.fna",
-            }
+            'id': 14,
         },
     },
     {
@@ -239,9 +235,7 @@ tasks_data = [
         'tool': builder,
         'params': {
             'model': 'MolecularAnnotation',
-            'query': {
-                "file_path": "/home/yuan/bio/references/NCBI/genome/Homo_sapiens/GCF_000001405.40/features/pseudogene.fna",
-            }
+            'id': 16,
         },
     },
     {
@@ -269,44 +263,43 @@ print(tasks)
 
 
 '''
-               T00
-   /   /    /   |    \   \   \  \   \
-T01  T02  T05  T08  T11 T14 T17 T20 T23
-  \  /     |    |    |   |   |   |   |
-   T03     |    |    |   |   |   |   |
-    |     /     |    |   |   |   |   |
-   T04   /      /    |   |   |   |   |
-    |\  /      /     |   |   |   |   |
-    | T06     /      /   |   |   |   |
-    |  |     /      /    |   |   |   |
-    | T07   /      /     |   |   |   |
-    |  |\  /      /      /   |   |   |
-    |  | T09     /      /    |   |   |
-    |  |  |     /      /     |   |   |
-    |  | T10   /      /      /   |   |
-    |  |  | \ /      /      /    |   |
-    |  |  | T12     /      /     |   |
-    |  |  |  |     /      /      /   |
-    |  |  | T13   /      /      /    |
-    |  |  |  | \ /      /      /     |
-    |  |  |  | T15     /      /      |
-    |  |  |  |  |     /      /       /
-    |  |  |  | T16   /      /       /
-    |  |  |  |  | \ /      /       /
-    |  |  |  |  | T18     /       /
-    |  |  |  |  |  |     /       /
-    |  |  |  |  | T19   /       /
-    |  |  |  |  |  | \ /       /
-    |  |  |  |  |  | T21      /
-    |  |  |  |  |  |  |      /
-    |  |  |  |  |  | T22    /
-    |  |  |  |  |  |  | \  /
+                T00
+   /  /  /   /   |   \  \   \   \
+T01 T02 T05 T08 T11 T14 T17 T20 T23
+  \  /   |   |   |   |   |   |   |
+   T03   |   |   |   |   |   |   |
+    |    |   |   |   |   |   |   |
+   T04   /   |   |   |   |   |   |
+    | \ /    |   |   |   |   |   |
+    | T06    |   |   |   |   |   |
+    |  |     /   |   |   |   |   |
+    | T07   /    |   |   |   |   |
+    |  | \ /     |   |   |   |   |
+    |  | T09     /   |   |   |   |
+    |  |  |     /    |   |   |   |
+    |  | T10   /     |   |   |   |
+    |  |  | \ /      /   |   |   |
+    |  |  | T12     /    |   |   |
+    |  |  |  |     /     |   |   |
+    |  |  | T13   /      /   |   |
+    |  |  |  | \ /      /    |   |
+    |  |  |  | T15     /     |   |
+    |  |  |  |  |     /      |   |
+    |  |  |  | T16   /      /    |
+    |  |  |  |  | \ /      /     |
+    |  |  |  |  | T18     /      |
+    |  |  |  |  |  |     /      /
+    |  |  |  |  | T19   /      /
+    |  |  |  |  |  | \ /      /
+    |  |  |  |  |  | T21     /
+    |  |  |  |  |  |  |     /
+    |  |  |  |  |  | T22   /
+    |  |  |  |  |  |  | \ /
     \  |  |  |  |  |  | T24
-     \ \  |  |  |  / /  |
-      \ \ \  |  / / /  T25
-       \ \ \ | / / /  /
-        \ \ \|/ / /  /
-            T30
+     \ \  |  |  |  |  |  |
+      \ \ \  |  |  / /  T25
+       \ \ \ \  | / /   /
+               T30
 '''
 print('Add Task Tree...')
 task_pair = [

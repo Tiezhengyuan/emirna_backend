@@ -14,7 +14,6 @@ from rna_seq.models import Project, TaskTree, TaskExecution,\
     ExecutionTree, MethodTool, Tool, Method, Genome, Annotation
 from rna_seq.constants import ROOT_METHOD, METHODS
 from .align import Align
-from .assemble import Assemble
 from .collect import Collect
 from .count import Count
 

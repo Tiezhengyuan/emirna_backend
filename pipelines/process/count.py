@@ -21,31 +21,20 @@ class Count:
         '''
         rc_files = self.scan_rc_files()
         # merge RC.txt if they exist
-        if rc_files.get('rc'):
-            self.merge_rc_files(rc_files['rc'])
-        if rc_files.get('stringtie'):
-            gene_json = self.params['genome_annot']['gff_json'].get('gene')
-            if gene_json:
-                gene = GFF(gene_json).lift_attribute('ID')
-                self.params['seqdata'].put_variables(gene)
-            self.stringtie_merge(rc_files['stringtie'], 'TPM')
-            self.stringtie_merge(rc_files['stringtie'], 'FPKM')
-        
+        if rc_files:
+            self.merge_rc_files(rc_files)
         # update seqdata.obj
         dump_seqdata(self.params['seqdata'], self.params['seqdata_path'])
         return None
 
     def scan_rc_files(self) -> Iterable:
-        rc_files = {'rc': [], 'stringtie': []}
+        rc_files = []
         for parent in self.params['parents']:
             outputs = parent.task_execution.get_output()
             for output in outputs:
-                if 'abundance_file' in output:
-                    item = (output['sample_name'], output['abundance_file'])
-                    rc_files['stringtie'].append(item)
-                elif 'RC' in output:
+                if 'RC' in output:
                     path = (output['sample_name'], output['RC'])
-                    rc_files['rc'].append(path)
+                    rc_files.append(path)
         return rc_files
                     
    
@@ -84,40 +73,15 @@ class Count:
         return rc_node
 
 
-    def stringtie_merge(self, rc_files:list, rc_type:str):
-        '''
-        stringtie
-        rc_type: 'TPM' or 'FPKM'
-        '''
-        outfile = os.path.join(self.params['output_dir'], f'{rc_type}.txt')
-        meta = {
-            'count': rc_type,
-            rc_type: outfile,
-            'samples': [i[0] for i in rc_files],
-        }
-        # update seqdata
-        node = NodeData(self.params['seqdata'].root, rc_type)
-        for sample_name, abund_file in rc_files:
-            df = pd.read_csv(abund_file, sep='\t', index_col=0, header=0)
-            node.put_data(pd.Series(df[rc_type], name=sample_name))
-        # remove zeros
-        node.X = node.X.loc[:,node.X.sum(axis=0)>0]
-        self.params['seqdata'].nodes[rc_type] = node
-
-        # sample in columns
-        df = self.params['seqdata'].to_df(rc_type, 1).T
-        df = df.convert_dtypes()
-        df.to_csv(outfile, index=True, index_label='ID', header=True, sep='\t')
-
-        meta['total'] = df[meta['samples']].sum().to_dict()
-        self.params['output'].append(meta)
-        return df
-
-
     def count_reads(self):
         '''
         reads counting from *.sam
         '''
+        # filter read counts. at least 2
+        min_counts = self.params.get('min_counts')
+        if min_counts is None or min_counts < 2:
+            min_counts = 2
+        
         for parent in self.params['parents']:
             output = parent.task_execution.get_output()
             for item in [i for i in output if 'sam_file' in i]:
@@ -127,6 +91,7 @@ class Count:
                 rc = self.analyze_samfile(item['sam_file'], unaligned_file)
                 # to txt
                 df = pd.DataFrame.from_dict(rc, orient='index', columns=[sample_name,])
+                df = df[df[sample_name]>=min_counts]
                 outfile = output_prefix + ".RC.txt"
                 df.to_csv(outfile, sep='\t', index_label='reference')
                 self.params['output'].append({

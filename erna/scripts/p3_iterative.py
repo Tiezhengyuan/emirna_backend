@@ -1,8 +1,8 @@
 '''
 example:
-    python3 erna/manage.py shell < erna/scripts/p3_mirnaseq_iterative.py
+    python3 erna/manage.py shell < erna/scripts/p3_iterative.py
 example of run tasks:
-    python3 erna/erna_app.py -m execute_tasks -p P0003 -c
+    python3 erna/erna_app.py -m execute_tasks -p P00003 -c
 '''
 from rna_seq.models import *
 from commons.models import CustomUser

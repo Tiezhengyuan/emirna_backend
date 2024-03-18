@@ -79,6 +79,7 @@ EXTERNALS_DIR = os.environ['EXTERNALS_DIR']
 # store data uploaded by user
 DATA_DIR = os.environ['DATA_DIR']
 
+# other directory
 # raw data namely fastq
 RAW_DATA_DIRS = os.environ['RAW_DATA_DIR'].split(' ')
 
@@ -90,6 +91,7 @@ REFERENCES_DIR = os.environ['REFERENCES_DIR']
 INDEX_DIR = os.path.join(REFERENCES_DIR, 'index')
 if not os.path.isdir(INDEX_DIR):
     os.mkdir(INDEX_DIR)
+
 
 #celery settings
 CELERY_BROKER_URL="redis://127.0.0.1:6379"
