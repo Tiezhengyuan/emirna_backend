@@ -11,21 +11,21 @@ class TaskTreeManager(models.Manager):
         task = Task.objects.get(project_id=project_id, task_id=task_id)
         return task, self.model.objects.filter(parent=task)
 
-    def get_parents(self, project_id:str, task_id:str):
+    def get_parents(self, project_id:str, task_id:str) -> tuple:
         '''
         one task may have multiple parents
         '''
         task = Task.objects.get(project_id=project_id, task_id=task_id)
-        parents = [task_tree.parent for task_tree in self.filter(child=task)]
-        return task, parents
+        tree = self.filter(child=task)
+        return task, tree
 
-    def get_children(self, project_id:str, task_id:str):
+    def get_children(self, project_id:str, task_id:str) -> tuple:
         '''
         one task may have multiple children
         '''
         task = Task.objects.get(project_id=project_id, task_id=task_id)
-        children = [task_tree.child for task_tree in self.filter(parent=task)]
-        return task, children
+        tree = self.filter(parent=task)
+        return task, tree
     
     def task_tree(self, project_id:str):
         res = {}

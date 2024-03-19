@@ -15,7 +15,6 @@ project_data = {
     "project_name": "test_iterative_mirna_seq",
     "description": "test miRNA-seq pipeline",
     "status": "active",
-    "sequencing": "mirna-seq",
     'owner': user,
 }
 project = Project.objects.update_or_create(

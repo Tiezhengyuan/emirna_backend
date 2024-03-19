@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
 
-from rna_seq.models import Project, SampleProject, STATUS_OPTIONS, SEQUENCING_OPTIONS
+from rna_seq.models import Project, SampleProject, STATUS_OPTIONS
 from api.serializers import ProjectSerializer
 
 
@@ -14,7 +14,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
   def get_queryset(self):
     config = {}
-    items = ['owner_id', 'sequencing', 'status', 'project_name']
+    items = ['owner_id', 'status', 'project_name']
     for name in items:
       val = self.request.query_params.get(name)
       if val:
@@ -31,7 +31,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
       "project_name": "test",
       "description": "for testing",
       "status": "A",
-      "sequencing": "M"
     }
     '''
     data = request.data
@@ -65,14 +64,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
     projects = [i.to_dict() for i in Project.objects.all()]
     options = {
       'status': [{'value': i[0], 'text': i[1]} for i in STATUS_OPTIONS],
-      'sequencing': [{'value': i[0], 'text': i[1]} for i in SEQUENCING_OPTIONS],
       'projects': [{'value': p, 'text': p['project_id']} for p in projects],
     }
     new_project = {
       'project_id': Project.objects.get_next_project_id(),
       'project_name': '',
       'description': '',
-      'sequencing': SEQUENCING_OPTIONS[0][0],
       'status': STATUS_OPTIONS[0][0],
     }
    

@@ -1,9 +1,6 @@
 from time import sleep
 import subprocess
 from django.conf import settings
-# import sys
-# sys.path.insert(0, getattr(settings, 'PIPELINES_DIR'))
-# print(sys.path)
 from celery import shared_task
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
@@ -16,7 +13,7 @@ they are automatically launched with django
 '''
 @shared_task
 def schedule_task():
-  res = scheduleTasks().run_task()
+  res = ScheduleTasks().run_task()
   return res
 
 '''
@@ -24,45 +21,45 @@ celery tasks
 '''
 @shared_task
 def execute_tasks(project_id):
-  from pipelines.process.execute_tasks import ExecuteTasks
+  from pipelines import ExecuteTasks
   return ExecuteTasks(project_id, None, True)()
 
 @shared_task
 def download_genome(data_source, specie_name, version):
-  from pipelines.process.process_genome import ProcessGenome
+  from pipelines import ProcessGenome
   p = ProcessGenome(data_source, specie_name, version)
   return p.download_genome()
 
 
 @shared_task
 def scan_raw_data():
-  from pipelines.process.process_raw_data import ProcessRawData
+  from pipelines import ProcessRawData
   return ProcessRawData().scan_raw_data()
 
 @shared_task
 def refresh_raw_data():
-  from pipelines.process.process_raw_data import ProcessRawData
+  from pipelines import ProcessRawData
   return ProcessRawData().refresh_raw_data()
 
 @shared_task
 def parse_sample_data(study_name, prefix=None, postfix=None):
-  from pipelines.process.process_raw_data import ProcessRawData
+  from pipelines import ProcessRawData
   c = ProcessRawData()
   return c.parse_sample_data(study_name, prefix, postfix)
 
 @shared_task
 def reset_sample():
-  from pipelines.process.process_raw_data import ProcessRawData
+  from pipelines import ProcessRawData
   return ProcessRawData().reset_sample()
 
 @shared_task
 def trim_adapter(params):
-  from pipelines.process.trim_adapter import TrimAdapter
+  from pipelines import TrimAdapter
   return TrimAdapter(params)()
 
 @shared_task
 def build_index(data_source, specie, version, aligner):
-  from pipelines.process.align import Align
+  from pipelines import Align
   c = Align(aligner)
   return c.build_index(data_source, specie, version)
 

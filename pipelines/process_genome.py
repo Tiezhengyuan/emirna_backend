@@ -107,9 +107,7 @@ class ProcessGenome:
       genome.save()
       # update db.Annotation
       Annotation.objects.load_annotations(genome, local_files)
-      return {
-        'local_files': local_files,
-      }
+      return {'local_files': local_files,}
     return None
 
   def molecular_annotation(self) -> list:

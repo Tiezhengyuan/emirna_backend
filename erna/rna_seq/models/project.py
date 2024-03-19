@@ -15,13 +15,6 @@ STATUS_OPTIONS = [
     ('deleted', 'deleted'),
 ]
 
-SEQUENCING_OPTIONS = [
-    ('mrna-seq', 'mRNA-Seq'),
-    ('mirna-seq', 'miRNA-Seq'),
-    ('scrna-seq', 'scRNA-Seq'),
-    ('other', 'other')
-]
-
 class ProjectManager(models.Manager):
 
     def get_last_project_id(self):
@@ -93,12 +86,6 @@ class Project(models.Model):
         default='active',
         choices=STATUS_OPTIONS,
     )
-    sequencing = models.CharField(
-        max_length=10,
-        default='mrna-seq',
-        choices=SEQUENCING_OPTIONS,
-        verbose_name = "Sequencing technique",
-    )
     create_time = models.DateTimeField(auto_now_add=True)
     project_name = models.CharField(
         max_length=50,
@@ -129,7 +116,6 @@ class Project(models.Model):
             'project_id': self.project_id,
             'project_name': self.project_name,
             'description': self.description,
-            'sequencing': self.sequencing,
             'status': self.status,
             'owner': self.owner.to_dict() if self.owner else None,
             'genome': self.genome.to_dict() if self.genome else default_genome,

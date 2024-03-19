@@ -13,8 +13,7 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'erna.settings')
 django.setup()
 
-from pipelines.process import ProcessRawData, ProcessGenome, \
-  ProcessNCRNA, ExecuteTasks, Align, TrimAdapter
+from pipelines import ProcessRawData, ProcessGenome, ProcessNCRNA, ExecuteTasks, Align, TrimAdapter
 
 
 def main(args):

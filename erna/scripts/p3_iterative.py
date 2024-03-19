@@ -15,7 +15,6 @@ project_data = {
     "project_name": "test_iterative_mirna_seq",
     "description": "test miRNA-seq pipeline",
     "status": "active",
-    "sequencing": "mirna-seq",
     'owner': user,
 }
 project = Project.objects.update_or_create(
@@ -60,6 +59,7 @@ tasks_data = [
             'adapter_3end': 'TGGAATTCTCGGGTGCCAAGG',
         },
     },
+    # miRNA mature
     {
         'task_id': 'T02',
         'method_name': 'build_index',
@@ -82,6 +82,7 @@ tasks_data = [
         'task_id': 'T04',
         'method_name': 'count_reads',
     },
+    # miRNA premature
     {
         'task_id': 'T05',
         'method_name': 'build_index',
@@ -103,6 +104,7 @@ tasks_data = [
         'task_id': 'T07',
         'method_name': 'count_reads',
     },
+    # lncRNA
     {
         'task_id': 'T08',
         'method_name': 'build_index',
@@ -124,6 +126,7 @@ tasks_data = [
         'task_id': 'T10',
         'method_name': 'count_reads',
     },
+    # collect read counts
     {
         'task_id': 'T11',
         'method_name': 'merge_read_counts',
