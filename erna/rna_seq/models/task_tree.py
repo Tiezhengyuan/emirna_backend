@@ -17,7 +17,8 @@ class TaskTreeManager(models.Manager):
         '''
         task = Task.objects.get(project_id=project_id, task_id=task_id)
         tree = self.filter(child=task)
-        return task, tree
+        parents = [t.parent for t in tree]
+        return task, tree, parents
 
     def get_children(self, project_id:str, task_id:str) -> tuple:
         '''
@@ -25,7 +26,8 @@ class TaskTreeManager(models.Manager):
         '''
         task = Task.objects.get(project_id=project_id, task_id=task_id)
         tree = self.filter(parent=task)
-        return task, tree
+        children = [t.child for t in tree]
+        return task, tree, children
     
     def task_tree(self, project_id:str):
         res = {}

@@ -18,7 +18,7 @@ class TaskTreeViewSet(viewsets.ModelViewSet):
         parent_ids = request.data.get('parents')
         res = []
         if project_id and child_task_id:
-            child_task, tree = TaskTree.objects.get_parents(project_id, child_task_id)
+            child_task, tree, _ = TaskTree.objects.get_parents(project_id, child_task_id)
             # remove relation if needed
             for tree_parent in tree:
                 # omit it if the parent is existing
@@ -33,8 +33,8 @@ class TaskTreeViewSet(viewsets.ModelViewSet):
                 obj = TaskTree.objects.create(parent=parent_task, child=child_task)
                 print(obj)
             # get new parents
-            _, new_tree = TaskTree.objects.get_parents(project_id, child_task_id)
-            res = [task_tree.parent.task_id for task_tree in new_tree]
+            _, _, parents = TaskTree.objects.get_parents(project_id, child_task_id)
+            res = [p.task_id for p in parents]
             print(res)
         return Response(res)
 

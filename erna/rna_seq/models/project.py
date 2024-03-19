@@ -61,7 +61,11 @@ class ProjectManager(models.Manager):
         return data['project_id']
    
     def delete(self, project_id):
-        return Project.objects.filter(project_id=project_id).update(status='D')
+        '''
+        change status, but no projects are deleted
+        '''
+        deleted = Project.objects.filter(project_id=project_id)
+        return deleted.update(status='deleted')
 
 
 class Project(models.Model):
@@ -74,12 +78,6 @@ class Project(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name="owner identified by user_id"
-    )
-    genome = models.ForeignKey(
-        'rna_seq.Genome',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
     )
     status = models.CharField(
         max_length=10,
@@ -109,17 +107,18 @@ class Project(models.Model):
         return self.project_id
 
     def to_dict(self):
-        default_genome = {
-            'genome_id': None,
-        }
         return {
             'project_id': self.project_id,
             'project_name': self.project_name,
             'description': self.description,
             'status': self.status,
             'owner': self.owner.to_dict() if self.owner else None,
-            'genome': self.genome.to_dict() if self.genome else default_genome,
         }
+    
+    def update_status(self, status:str):
+        if status in [i[0] for i in STATUS_OPTIONS]:
+            self.status = status
+            self.save()
     
 
     

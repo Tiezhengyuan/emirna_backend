@@ -106,35 +106,46 @@ class TaskManager(models.Manager):
         for data in tasks_data:
             task_id = data.get('task_id')
             task = self.add_task(project, task_id, data)
-            # update Project.genome if there is
-            print(data, task)
-            if 'params' in data and 'genome_id' in data['params']:
-                genome_id = data['params']['genome_id']
-                project.genome = Genome.objects.get(pk=genome_id)
         else:
             # update Project
             project.status = 'ready'
             project.save()
         return self.filter(project=project_id)
 
-    def delete_tasks(self, project_id:str=None, task_id:str=None):
+    def delete(self, project_id:str, task_id:str=None):
         '''
         delete all/some tasks, or single task
+        Note: project.status should be updated if necessary
         '''
-        if project_id:
+        project = Project.objects.get(project_id=project_id)
+        if project:
+            tasks = self.filter(project=project)
             # single task
             if task_id:
-                tasks = self.filter(project_id=project_id, task_id=task_id)
-                return tasks.delete()
-            # project tasks
+                single_task = self.filter(project=project, task_id=task_id)
+                if len(single_task) == len(tasks):
+                    project.status = 'active'
+                    project.save()
+                return single_task.delete()
+            # all project tasks
             else:
-                tasks = self.filter(project_id=project_id)
+                project.status = 'active'
+                project.save()
                 return tasks.delete()
-        else:
-            # all tasks
-            if task_id is None:
-                return self.all().delete()
         return []
+    
+    def delete_all(self):
+        '''
+        truncate Task: delete all tasks
+        Note: project.status should be updated if necessary
+        '''
+        tasks = self.all()
+        for project in Project.objects.all():
+            if project.status == 'ready':
+                project.status = 'active'
+                project.save()
+        return tasks.delete()
+
 
     def project_tasks(self, project_id:str):
         res = []

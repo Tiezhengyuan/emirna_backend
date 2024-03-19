@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
 
-from rna_seq.models import Task, TaskTree
+from rna_seq.models import Project, Task, TaskTree
 from api.serializers import TaskSerializer
 
 
@@ -36,9 +36,14 @@ class TaskViewSet(viewsets.ModelViewSet):
   def delete_tasks(self, request):
     project_id = request.GET.get('project_id')
     task_id = request.GET.get('task_id')
-    res = Task.objects.delete_tasks(project_id, task_id)
+    res = Task.objects.delete(project_id, task_id)
     return Response(res)
-  
+
+  @action(detail=False, methods=['delete'])
+  def delete_all(self, request):
+    res = Task.objects.delete_all()
+    return Response(res)
+
   @action(detail=False, methods=['get'])
   def front_project_tasks(self, request):
     '''
@@ -47,11 +52,13 @@ class TaskViewSet(viewsets.ModelViewSet):
     project_id = self.request.query_params.get('project_id')
     if project_id is None:
       return Response({'error': f'project_id={project_id} is missing.'})
-
+    
+    project = Project.objects.get(project_id=project_id)
     res = {
       'task_tree': TaskTree.objects.task_tree(project_id),
       'tasks': Task.objects.project_tasks(project_id),
       'new_task_id': Task.objects.next_task_id(project_id),
+      'project_status': project.status,
     }
     return Response(res)
          

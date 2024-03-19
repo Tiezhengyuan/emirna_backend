@@ -104,6 +104,7 @@ tasks_data = [
     },
 ]
 Task.objects.filter(project_id=project_id).delete()
+# update Task, Project.status
 tasks = Task.objects.load_tasks(project_id, tasks_data)
 print(tasks)
 

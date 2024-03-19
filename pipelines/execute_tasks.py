@@ -19,56 +19,68 @@ from .count import Count
 
 class ExecuteTasks:
     def __init__(self, project_id:str, task_id:str=None, chain:bool=None, force:bool=None):
-        self.pool = []
+        self.project_id = project_id
         self.chain = True if (chain or task_id is None) else False
         if not task_id:
             task_id = 'T00'
-        self.pool = [(project_id, task_id, None),]
+        self.pool = [(task_id, None),]
         self.force = force if force else True
 
     def __call__(self) -> bool:
-        i = 0
-        while i < len(self.pool):
-            project_id, task_id, parent_params = self.pool[i]
-            params = self.init_params(project_id, task_id)
-            # postpone the task if parent tasks are not ready
-            if self.postpone_task(params, i):
-                continue
-            
-            # update params if the task seems being ready.
-            params = self.retreive_metadata(params)
-            params['parent_params'] = parent_params
-            
-            # stop execution if the task is occupied.
-            if self.skip_task(params):
-                return False
+        project = Project.objects.get(project_id=self.project_id)
+        project.update_status('locked')
 
-            # try to run the task
-            self.init_task(params)
-            self.run_task(params)
-            self.end_task(params)
+        try:
+            i = 0
+            while i < len(self.pool):
+                task_id, parent_params = self.pool[i]
+                params = self.init_params(project, task_id)
 
-            # add the next task into self.pool
-            if self.chain and params.get('children'):
-                for child in params['children']:
-                    tag = 1
-                    for item in self.pool:
-                        if item[1] == child.task_id:
-                            tag = 0
-                    if tag == 1:
-                        next_task = (project_id, child.task_id, params)
-                        self.pool.append(next_task)
-            i += 1
+                # postpone the task if parent tasks are not ready
+                if self.postpone_task(params, i):
+                    print(f"Postpone task={task_id}\n\n")
+                    continue
+                
+                # update params if the task seems being ready.
+                params = self.retreive_metadata(params)
+                params['parent_params'] = parent_params
+                
+                # stop execution if the task is occupied.
+                if self.skip_task(params):
+                    return False
+
+                # try to run the task
+                self.init_task(params)
+                self.run_task(params)
+                self.end_task(params)
+
+                print(f"Try to add the next task into task execution")
+                if self.chain and params.get('children'):
+                    for child in params['children']:
+                        tag = 1
+                        for item in self.pool:
+                            if item[0] == child.task_id:
+                                tag = 0
+                        if tag == 1:
+                            next_task = (child.task_id, params)
+                            self.pool.append(next_task)
+                i += 1
+                # print(i, self.pool)
+        except Exception as e:
+            print(f"Failed in execution tasks: error={e}.")
+        finally:
+            project.update_status('ready')
         return True
 
-    def init_params(self, project_id:str, task_id:str) -> dict:
+    def init_params(self, project, task_id:str) -> dict:
         '''
         get project and task instance 
         '''
-        project = Project.objects.get(project_id=project_id)
-        task, parents = TaskTree.objects.get_parents(project_id, task_id)
+        print(f"Initialize task {task_id}")
+        # task relations
+        task, _, parents = TaskTree.objects.get_parents(self.project_id, task_id)
         # load seqdata
-        seqdata_file = os.path.join(settings.RESULTS_DIR, project.project_id,
+        seqdata_file = os.path.join(settings.RESULTS_DIR, self.project_id, \
             f"T00_{ROOT_METHOD['method_name']}", "seqdata.obj")
         params = {
             'project': project,
@@ -90,7 +102,7 @@ class ExecuteTasks:
         # parents exist
         if params['parents']:
             # get task_ids of all finished tasks
-            finished_task_ids = [item[1] for item in self.pool[:i+1]]
+            finished_task_ids = [item[0] for item in self.pool[:i+1]]
             for parent in params['parents']:
                 # at least one parent is not finished, then postpone the task
                 if parent.task_id not in finished_task_ids:
@@ -115,29 +127,6 @@ class ExecuteTasks:
             params['tool'] = Tool.objects.get(pk=method_tool.tool.pk) \
                 if method_tool.tool else None
 
-        # Genome
-        if params['project'].genome:
-            genome = Genome.objects.get(pk=params['project'].genome.pk)
-            params['genome'] = genome
-            # genome DNA
-            annot = {
-                'dna': Annotation.objects.genome_annot(genome, 'fna'),
-                'gtf': None,
-                'gff': None,
-                'gtf_json': {},
-                'gff_json': {},
-            }
-            # TODO: the best approach on how to connect annotations
-            #Note: GFF works, but GTF doesn't work in StringTie (bug)
-            gtf_annot = Annotation.objects.genome_annot(genome, 'gtf')
-            if gtf_annot:
-                annot['gtf'] = gtf_annot
-                annot['gtf_json'] = Collect.import_gtf_annotations(annot['gtf'].file_path)
-            gff_annot = Annotation.objects.genome_annot(genome, 'gff')
-            if gff_annot:
-                annot['gff'] = gff_annot
-                annot['gff_json'] = Collect.import_gff_annotations(annot['gff'].file_path)
-            params['genome_annot'] = annot
         return params
 
     def combine_parents_output(self, parents:list) -> list:
@@ -214,29 +203,17 @@ class ExecuteTasks:
 
             case 'build_index':
                 return Align(params).build_index()
-            case 'build_genome_index':
-                return Align(params).build_genome_index()
-
-            case 'align_transcriptome':
-                return Align(params).align()
             case 'align_short_reads':
                 return Align(params).align()
-
-            case 'assemble_transcripts':
-                return Assemble(params).assemble_transcripts()
 
             case 'import_data':
                 # task T00
                 return Collect(params).import_data()
-            case 'merge_transcripts':
-                return Collect(params).merge_transcripts()
-            
+
             case 'count_reads':
                 return Count(params).count_reads()
             case 'merge_read_counts':
                 return Count(params).merge_read_counts()
-            case 'merge_stringtie_read_counts':
-                return Count(params).merge_stringtie_read_counts()
 
             case 'quality_control':
                 from .quality_control import QualityControl
