@@ -1,7 +1,7 @@
 from time import sleep
 import subprocess
 from django.conf import settings
-from celery import shared_task
+from celery import shared_task, current_task
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
@@ -22,7 +22,11 @@ celery tasks
 @shared_task
 def execute_tasks(project_id):
   from pipelines import ExecuteTasks
-  return ExecuteTasks(project_id, None, True)()
+  # pass celery task id to django
+  celery_task_id = current_task.request.get('id')
+  res = ExecuteTasks(project_id, celery_task_id, None, True)()
+  logger.info(f"Try to launch execute_task. project={project_id}")
+  return res 
 
 @shared_task
 def download_genome(data_source, specie_name, version):

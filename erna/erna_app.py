@@ -105,7 +105,8 @@ def main(args):
       task_id = args.get('task_id')
       chain = args.get('chain')
       if project_id:
-        return ExecuteTasks(project_id, task_id, chain)()
+        # celery_task_id is None because that is launched at backend terminal
+        return ExecuteTasks(project_id, None, task_id, chain)()
     case _:
       print('wrong arguments')
 

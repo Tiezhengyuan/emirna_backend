@@ -4,6 +4,7 @@ from .commons import *
 # app: rna_seq
 from .project_user_viewset import *
 from .project_viewset import *
+from .project_execution_viewset import *
 from .task_viewset import *
 from .task_annotation_viewset import *
 from .task_execution_viewset import *

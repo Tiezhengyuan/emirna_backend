@@ -23,6 +23,7 @@ router.register('molecular_annotation', MolecularAnnotationViewSet, basename='mo
 
 router.register('pipeline', PipelineViewSet, basename='pipeline')
 router.register('project', ProjectViewSet, basename='project')
+router.register('project_execution', ProjectExecutionViewSet, basename='project_execution')
 router.register('project_user', ProjectUserViewSet, basename='project_user')
 
 router.register('raw_data', RawDataViewSet, basename='raw_data')

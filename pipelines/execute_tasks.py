@@ -2,24 +2,29 @@
 scheduled tasks:
 search table Task and detect tasks with 'is_ready'=True
 '''
-from biosequtils import Dir
 from copy import deepcopy
 import json
 import os
 from django.conf import settings
+from biosequtils import Dir
 from rnaseqdata import load_seqdata
 
-
-from rna_seq.models import Project, TaskTree, TaskExecution,\
-    ExecutionTree, MethodTool, Tool, Method, Genome, Annotation
+from rna_seq.models import Project, TaskTree, TaskExecution, ExecutionTree,\
+    ProjectExecution, MethodTool, Tool, Method, Genome, Annotation
 from rna_seq.constants import ROOT_METHOD, METHODS
 from .align import Align
 from .collect import Collect
 from .count import Count
 
+
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__)
+
 class ExecuteTasks:
-    def __init__(self, project_id:str, task_id:str=None, chain:bool=None, force:bool=None):
+    def __init__(self, project_id:str, celery_task_id:str=None, task_id:str=None, chain:bool=None, force:bool=None):
         self.project_id = project_id
+        self.project = None
+        self.celery_task_id = celery_task_id
         self.chain = True if (chain or task_id is None) else False
         if not task_id:
             task_id = 'T00'
@@ -27,26 +32,26 @@ class ExecuteTasks:
         self.force = force if force else True
 
     def __call__(self) -> bool:
-        project = Project.objects.get(project_id=self.project_id)
-        project.update_status('locked')
-
         try:
+            project_execution = ProjectExecution.objects.start(self.project_id, self.celery_task_id)
+            self.project = project_execution.project
+
             i = 0
             while i < len(self.pool):
                 task_id, parent_params = self.pool[i]
-                params = self.init_params(project, task_id)
+                params = self.init_params(task_id)
 
                 # postpone the task if parent tasks are not ready
                 if self.postpone_task(params, i):
-                    print(f"Postpone task={task_id}\n\n")
+                    logger.warning(f"Postpone task={task_id}\n\n")
                     continue
                 
-                # update params if the task seems being ready.
+                #Update params if the task seems being ready
                 params = self.retreive_metadata(params)
                 params['parent_params'] = parent_params
                 
-                # stop execution if the task is occupied.
                 if self.skip_task(params):
+                    logger.warning(f"Stop execution if the task {task_id} is occupied.")
                     return False
 
                 # try to run the task
@@ -54,7 +59,7 @@ class ExecuteTasks:
                 self.run_task(params)
                 self.end_task(params)
 
-                print(f"Try to add the next task into task execution")
+                #Try to add next tasks into task execution
                 if self.chain and params.get('children'):
                     for child in params['children']:
                         tag = 1
@@ -65,25 +70,26 @@ class ExecuteTasks:
                             next_task = (child.task_id, params)
                             self.pool.append(next_task)
                 i += 1
-                # print(i, self.pool)
+            project_execution.finish()
         except Exception as e:
-            print(f"Failed in execution tasks: error={e}.")
+            logger.error(f"Failed in execution project: error={e}.")
+            return False
         finally:
-            project.update_status('ready')
+            logger.info("Project execution is done.\n\n")
         return True
 
-    def init_params(self, project, task_id:str) -> dict:
+    def init_params(self, task_id:str) -> dict:
         '''
         get project and task instance 
         '''
-        print(f"Initialize task {task_id}")
+        logger.info(f"Initialize task {task_id}")
         # task relations
         task, _, parents = TaskTree.objects.get_parents(self.project_id, task_id)
         # load seqdata
         seqdata_file = os.path.join(settings.RESULTS_DIR, self.project_id, \
             f"T00_{ROOT_METHOD['method_name']}", "seqdata.obj")
         params = {
-            'project': project,
+            'project': self.project,
             'task': task,
             'parents': parents,
             'seqdata': load_seqdata(seqdata_file),
@@ -137,7 +143,6 @@ class ExecuteTasks:
             return []
         
         parent_output = deepcopy(parents[0].task_execution.get_output())
-        print("##parent_output", parent_output)
         if len(parents) > 1:
             for parent in parents[1:]:
                 another = deepcopy(parent.task_execution.get_output())
@@ -152,13 +157,13 @@ class ExecuteTasks:
         '''
         methods = [i['method_name'] for i in METHODS]
         if params['method'].method_name not in methods:
-            print(f"wrong method name. {params['method'].method_name}.")
+            logger.error(f"wrong method name. {params['method'].method_name}.")
             return False
         
         status = params['task'].task_execution.status if \
             params['task'].task_execution else None
         if status == 'run' and not self.force:
-            print(f'''
+            logger.warning(f'''
                 Skipp the task  because that is running.
                 task id={params['task'].id}
                 execution id={params['task'].task_execution.id},
@@ -170,7 +175,7 @@ class ExecuteTasks:
     def init_task(self, params:dict) -> None:
         '''
         '''
-        print(f"Try to run task={params['task'].task_id}.")
+        logger.info(f"Try to run task={params['task'].task_id}.")
         # variables
         params['cmd'] = None
         params['force_run'] = True
@@ -227,7 +232,7 @@ class ExecuteTasks:
     def end_task(self, params:dict) -> None:
         task_id = params['task'].task_id
         exec_id = params['task_execution'].id
-        print(f"\nThe task {task_id} ends. execution={exec_id}\n\n")
+        logger.info(f"\nThe task {task_id} ends. execution={exec_id}\n\n")
         # update db.TaskExecution
         params['task_execution'].end_execution(params.get('output'))
         # save meta data into json

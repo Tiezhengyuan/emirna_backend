@@ -28,6 +28,10 @@ class ProjectUserSerializer(serializers.ModelSerializer):
         model = ProjectUser
         fields = '__all__'
 
+class ProjectExecutionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectExecution
+        fields = '__all__'
 
 class TaskExecutionSerializer(serializers.ModelSerializer):
     class Meta:

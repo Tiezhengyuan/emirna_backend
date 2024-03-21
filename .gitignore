@@ -5,6 +5,7 @@ pipelines/tests/temp/*
 raw_data/
 results/
 references/
+logs/
 
 
 # 

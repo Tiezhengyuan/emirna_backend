@@ -67,6 +67,9 @@ PIPELINES_DIR = os.path.join(PROJECT_DIR, 'pipelines')
 # third-party bioinformatics tools
 EXTERNALS_DIR = os.path.join(PROJECT_DIR, 'externals')
 
+# third-party bioinformatics tools
+LOGS_DIR = os.path.join(PROJECT_DIR, 'logs')
+
 # raw data namely fastq
 RAW_DATA_DIRS = [os.path.join(PROJECT_DIR, 'raw_data'),]
 
@@ -96,3 +99,4 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="*/1"),
     },
 }
+CELERYD_HIJACK_ROOT_LOGGER=True

@@ -1,5 +1,6 @@
 from .project import *
 from .project_user import ProjectUser
+from .project_execution import ProjectExecution
 from .task import Task
 from .task_tree import TaskTree
 from .task_execution import TaskExecution

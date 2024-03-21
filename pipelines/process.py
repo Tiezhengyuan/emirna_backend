@@ -1,6 +1,7 @@
 import os
+import logging
 import subprocess
-
+from django.conf import settings
 
 class Process:
 
@@ -38,3 +39,13 @@ class Process:
         if res.stderr:
             print(res.stderr)
         return res
+    
+    @staticmethod
+    def logger(log_path:str=None):
+        log_path = log_path if log_path else os.path.join(settings.LOGS_DIR, "default.log")
+        format = "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+        logging.basicConfig(filename= log_path, filemode='w', format=format)
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        logger.info(f"Record exeuction information in {log_path}")
+        return logger
