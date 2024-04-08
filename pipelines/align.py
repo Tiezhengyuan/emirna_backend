@@ -13,6 +13,9 @@ from .process_cmd import ProcessCMD
 EXTERNALS_DIR = getattr(settings, 'EXTERNALS_DIR')
 REFERENCES_DIR = getattr(settings, 'REFERENCES_DIR')
 
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__)
+
 
 class Align:
   def __init__(self, params:dict=None):
@@ -67,7 +70,6 @@ class Align:
 
     # build index
     index_path = obj.get_index_path(tool)
-    # print('##index_path', tool, index_path)
     meta_data = {
       'fa_path': obj.file_path,
       'index_path': index_path,
@@ -97,12 +99,12 @@ class Align:
     if self.params.get('task') and self.params['task'].get_params():
       index_path = self.params['task'].get_params().get('index_path')
       if index_path:
-        print("#Get index path form task.params")
+        logger.info(f"Get index path from task.params.")
         return index_path
     
     # secondly check its parent TaskExecution
     if self.params.get('parent_params'):
-      print("#Get index path form parent_params.")
+      logger.info(f"Get index path form parent_params={self.params['parent_params']}.")
       parent_output = self.params['parent_params']['output']
       for item in parent_output:
         if 'index_path' in item:
@@ -111,7 +113,7 @@ class Align:
     # Finally check its execution of parent Task
     for parent_output in self.params['parent_outputs']:
       if 'index_path' in parent_output:
-        print("#Get index path form parent_outputs")
+        logger.info(f"Get index path from parent_outputs={parent_output}")
         return parent_output['index_path']
     return None
 
@@ -128,7 +130,6 @@ class Align:
     
     sample_files = self.params['parent_outputs']
     for meta_data in sample_files:
-      # print('##', meta_data)
       sample_name = meta_data['sample_name']
       output_prefix = os.path.join(self.params['output_dir'], sample_name)
       meta_data['index_path'] = self.get_index_path()

@@ -9,6 +9,7 @@ def _return(task_id, *args, **kwargs):
   res = {
     'task_id': [str(task_id),],
   }
+  res.update(kwargs)
   return JsonResponse(res, safe=False)
 
 

@@ -3,6 +3,10 @@ import logging
 import subprocess
 from django.conf import settings
 
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__)
+
+
 class Process:
 
     @staticmethod
@@ -17,12 +21,12 @@ class Process:
                 log = f"{params.get('output_prefix', '_')}.out.log"
                 with open(log, 'w') as f:
                     f.writelines(res.stdout)
-                print(res.stdout)
+                logger.info(res.stdout)
             if res.stderr:
                 err_log = f"{params.get('output_prefix', '_')}.err.log"
                 with open(err_log, 'w') as f:
                     f.writelines(res.stderr)
-                print(res.stderr)
+                logger.error(res.stderr)
             return res
         return None
 
@@ -31,13 +35,13 @@ class Process:
         if not os.path.isfile(gz_file):
             return None
         # run gzip
-        print(f"Try to uncompress {gz_file}")
+        logger(f"Try to uncompress {gz_file}")
         cmd = ' '.join(['gzip', '-d', gz_file])
         res = subprocess.run(cmd, capture_output=True, text=True, shell=True)
         if res.stdout:
-            print(res.stdout)
+            logger.info(res.stdout)
         if res.stderr:
-            print(res.stderr)
+            logger.error(res.stderr)
         return res
     
     @staticmethod

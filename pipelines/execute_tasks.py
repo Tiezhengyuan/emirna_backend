@@ -9,13 +9,12 @@ from django.conf import settings
 from biosequtils import Dir
 from rnaseqdata import load_seqdata
 
-from rna_seq.models import Project, TaskTree, TaskExecution, ExecutionTree,\
-    ProjectExecution, MethodTool, Tool, Method, Genome, Annotation
+from rna_seq.models import TaskTree, TaskExecution, ExecutionTree,\
+    ProjectExecution, MethodTool, Tool, Method
 from rna_seq.constants import ROOT_METHOD, METHODS
 from .align import Align
 from .collect import Collect
 from .count import Count
-
 
 from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)

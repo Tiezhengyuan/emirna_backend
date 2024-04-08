@@ -8,7 +8,7 @@ Django==4.2.6
 djangorestframework==3.14.0
 django-celery-beat==2.5.0
 django-celery-results==2.5.1
-django-cors-headers==4.3.0
+django-cors-headers==4.3.1
 eseq
 numpy
 pandas

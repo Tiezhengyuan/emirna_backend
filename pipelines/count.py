@@ -42,7 +42,6 @@ class Count:
         '''
         merge multiple RC files into RC.txt
         '''
-        # print(rc_files[-4:])
         # update SeqData
         rc_node = NodeData(self.params['seqdata'].root, 'RC')
         for sample_name, rc_file in rc_files:

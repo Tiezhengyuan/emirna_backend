@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+
+  web:
+    build: .
+    container_name: emirna-backend
+    command: python3 erna/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "5000:8000"
+    environment:
+      - mode=local
+
+  nginx:
+    image: nginx
+    container_name: emirna-backend-nginx
+    restart: always
+    volumes:
+      - ./config/nginx:/etc/nginx/template
+      - .:/code/
+    expose:
+      - 5000

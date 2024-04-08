@@ -9,6 +9,9 @@ import os
 
 from rna_seq.constants import TRIM
 
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__)
+
 class TrimAdapter:
   def __init__(self, params:dict):
     self.params = params
@@ -75,7 +78,7 @@ class TrimAdapter:
 
     total = info['total_reads'] if info['total_reads'] > 0 else 1
     info['trim_percentage'] = round(info['trimmed_reads']/total, 4)
-    print(info)
+    logger.info(f"Trim 3-end sequences: {info}")
     return info
   
   def keep_5end(self, task_params, infile, outfile):
