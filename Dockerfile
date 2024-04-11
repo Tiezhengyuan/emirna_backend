@@ -1,11 +1,14 @@
 FROM python:3.11
-ENV PYTHONUNBUFFERED 1
-RUN apt-get update && apt-get install -y iputils.ping
+RUN apt-get update && apt-get install -y netcat-traditional vim
+MAINTAINER TiezhengYuan
 
-# source code in /web in the container
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN mkdir -p /code
 WORKDIR /code
-# install dependency
-COPY requirements.txt /code/
+
+RUN /usr/local/bin/python -m pip install --upgrade pip
+ADD ./requirements.txt /code/
 RUN pip install -r requirements.txt
-# copy all source code into /code/
-COPY . /code/
+ADD . ./code/

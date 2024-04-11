@@ -10,6 +10,7 @@ logs/
 
 # 
 */__pycache__/
+erna/db.sqlite3
 erna/*/__pycache__/
 erna/*/*/__pycache__/
 erna/*/migrations/
