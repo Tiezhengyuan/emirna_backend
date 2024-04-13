@@ -5,11 +5,8 @@ import os
 from pathlib import Path
 from celery.schedules import crontab
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-PROJECT_DIR = os.path.dirname(BASE_DIR)
-
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -23,7 +20,6 @@ CORS_ALLOWED_ORIGINS = (
     'http://localhost:8080',
     'http://127.0.0.1:8080',
 )
-
 
 TEMPLATES = [
     {
@@ -55,33 +51,10 @@ DATABASES = {
     }
 }
 
-
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-
-
-# other related path
-PIPELINES_DIR = os.path.join(PROJECT_DIR, 'pipelines')
-
-# third-party bioinformatics tools
-EXTERNALS_DIR = os.path.join(PROJECT_DIR, 'externals')
-
-# third-party bioinformatics tools
-LOGS_DIR = os.path.join(PROJECT_DIR, 'logs')
-
-# raw data namely fastq
-RAW_DATA_DIRS = [os.path.join(PROJECT_DIR, 'raw_data'),]
-
-# analytic results
-RESULTS_DIR = os.path.join(PROJECT_DIR, 'results')
-
-# reference namely genome DNA in fa format
-REFERENCES_DIR = os.path.join(PROJECT_DIR, 'references')
-INDEX_DIR = os.path.join(REFERENCES_DIR, 'index')
-if not os.path.isdir(INDEX_DIR):
-    os.mkdir(INDEX_DIR)
 
 
 #celery settings

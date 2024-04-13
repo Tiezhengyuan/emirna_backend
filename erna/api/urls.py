@@ -41,8 +41,9 @@ router.register('task_tree', TaskTreeViewSet, basename='task_tree')
 router.register('tool', ToolViewSet, basename='tool')
 
 router.register('user', CustomUserViewSet, basename='user')
-
+# router.register('commons', CommonsViewSet, basename='commons')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('token/', get_token),
 ]

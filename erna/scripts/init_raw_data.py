@@ -10,7 +10,7 @@ example:
 # import sys
 # print(sys.path)
 
-from pipelines.process.process_raw_data import ProcessRawData
+from pipelines.process_raw_data import ProcessRawData
 
 client = ProcessRawData()
 print('Search and uncompress gz files...')

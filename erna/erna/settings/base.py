@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+PROJECT_DIR = os.path.dirname(BASE_DIR)
 
 
 # Quick-start development settings - unsuitable for production
@@ -33,6 +36,7 @@ INSTALLED_APPS = [
     # additional apps
     'rest_framework',
     'corsheaders',
+    'braces',
     'django_celery_results',
     'django_celery_beat',
 
@@ -106,6 +110,30 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# other related path
+PIPELINES_DIR = os.path.join(PROJECT_DIR, 'pipelines')
+
+# third-party bioinformatics tools
+EXTERNALS_DIR = os.path.join(PROJECT_DIR, 'externals')
+
+# third-party bioinformatics tools
+LOGS_DIR = os.path.join(PROJECT_DIR, 'logs')
+
+# raw data namely fastq
+RAW_DATA_DIRS = [os.path.join(PROJECT_DIR, 'raw_data'),]
+
+# analytic results
+RESULTS_DIR = os.path.join(PROJECT_DIR, 'results')
+
+# reference namely genome DNA in fa format
+REFERENCES_DIR = os.path.join(PROJECT_DIR, 'references')
+INDEX_DIR = os.path.join(REFERENCES_DIR, 'index')
+if not os.path.isdir(INDEX_DIR):
+    os.mkdir(INDEX_DIR)
+
+
 
 # LOGGING = {
 #     'version': 1,

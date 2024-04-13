@@ -2,10 +2,14 @@
 venv/
 externals/output/
 pipelines/tests/temp/*
-raw_data/
-results/
-references/
-logs/
+raw_data/*
+!raw_data/readme
+results/*
+!results/readme
+references/*
+!references/readme
+logs/*
+!logs/readme
 
 
 # 
@@ -15,9 +19,11 @@ erna/*/__pycache__/
 erna/*/*/__pycache__/
 erna/*/migrations/
 erna/rna_seq/*/migrations/
+erna/db.sqlite3
 pipelines/*/__pycache__/
 pipelines/*/*/__pycache__/
 rna_seq/models/constants/__pycache__/
+
 
 # 
 .ctab/

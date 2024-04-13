@@ -6,6 +6,7 @@ biosequtils
 celery==5.3.4
 Django==4.2.6
 djangorestframework==3.14.0
+django_braces==1.15.0
 django-celery-beat==2.5.0
 django-celery-results==2.5.1
 django-cors-headers==4.3.1

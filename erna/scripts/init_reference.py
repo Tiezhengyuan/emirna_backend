@@ -4,8 +4,8 @@ example:
     python3 erna/manage.py shell < erna/scripts/init_reference.py
 '''
 from rna_seq.models import Genome, AlignerIndex
-from pipelines.process.process_genome import ProcessGenome
-from pipelines.process.process_ncrna import ProcessNCRNA
+from pipelines.process_genome import ProcessGenome
+from pipelines.process_ncrna import ProcessNCRNA
 
 print('\n\n###Begin to refresh/update database###\n\n')
 

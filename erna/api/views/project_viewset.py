@@ -3,12 +3,13 @@ from django.http import JsonResponse
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
+from braces.views import CsrfExemptMixin
 
 from rna_seq.models import Project, SampleProject, STATUS_OPTIONS
 from api.serializers import ProjectSerializer
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
+class ProjectViewSet(CsrfExemptMixin, viewsets.ModelViewSet):
   serializer_class = ProjectSerializer
   permission_classes = [permissions.IsAuthenticated,]
 
@@ -30,7 +31,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     {
       "project_name": "test",
       "description": "for testing",
-      "status": "A",
+      "status": "active",
     }
     '''
     data = request.data

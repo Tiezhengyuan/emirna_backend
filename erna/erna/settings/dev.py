@@ -10,23 +10,38 @@ import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-PROJECT_DIR = os.path.dirname(BASE_DIR)
-# print('###base_dir=', BASE_DIR)
-# print('###project_dir=', PROJECT_DIR)
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG')
 
 # Django settings for projects
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost', '127.0.0.1', 
+    # host name defined in nginx conf
+    'app',
+]
 
+# cross origin
 CORS_ORIGIN_ALLOW_ALL = False
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:8080',
-)
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8080', 'http://127.0.0.1:8080',
+]
+CORS_ALLOW_CREDENTIALS = True
 
+# csrf token
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+]
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+
+# session secure
+SESSION_COOKIE_SECURE = False
 
 TEMPLATES = [
     {
@@ -58,34 +73,12 @@ DATABASES = {
     }
 }
 
-# print('###db:', BASE_DIR / 'db.sqlite3')
-
 
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, 'static'),
 # ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-
-# other related path
-PIPELINES_DIR = os.path.join(PROJECT_DIR, 'pipelines')
-
-# third-party bioinformatics tools
-EXTERNALS_DIR = os.path.join(PROJECT_DIR, 'externals')
-# print(EXTERNALS_DIR)
-
-# other directory
-# raw data namely fastq
-RAW_DATA_DIRS = os.environ['RAW_DATA_DIR'].split(',')
-
-# analytic results
-RESULTS_DIR = os.environ['RESULTS_DIR']
-
-# reference namely genome DNA in fa format
-REFERENCES_DIR = os.environ['REFERENCES_DIR']
-INDEX_DIR = os.path.join(REFERENCES_DIR, 'index')
-if not os.path.isdir(INDEX_DIR):
-    os.mkdir(INDEX_DIR)
 
 
 #celery settings
