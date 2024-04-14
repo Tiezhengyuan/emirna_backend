@@ -7,9 +7,6 @@ example:
 - Uncompress *gz files
 - Reload raw data into RawData
 '''
-# import sys
-# print(sys.path)
-
 from pipelines.process_raw_data import ProcessRawData
 
 client = ProcessRawData()

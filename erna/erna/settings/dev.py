@@ -15,52 +15,34 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG')
 
-# Django settings for projects
-
+# Access hosts
 ALLOWED_HOSTS = [
-    'localhost', '127.0.0.1', 
+    'localhost',
+    '127.0.0.1', 
     # host name defined in nginx conf
     'app',
+    'vue_nginx',
 ]
 
 # cross origin
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:8080', 'http://127.0.0.1:8080',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    # 'http://app',
 ]
 CORS_ALLOW_CREDENTIALS = True
 
 # csrf token
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8080',
-    'http://127.0.0.1:8080',
-]
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
-CSRF_COOKIE_NAME = 'csrftoken'
+# CSRF_TRUSTED_ORIGINS = [
+#     'http://localhost:8080',
+#     'http://127.0.0.1:8080',
+# ]
+# allow CSRF cookie by HTTP
 CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
 
 # session secure
 SESSION_COOKIE_SECURE = False
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
-
 
 
 # Database
@@ -69,7 +51,7 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db_dev.sqlite3',
     }
 }
 

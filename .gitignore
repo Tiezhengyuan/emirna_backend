@@ -1,5 +1,7 @@
 
 venv/
+
+# mounted dir
 externals/output/
 pipelines/tests/temp/*
 raw_data/*
@@ -11,15 +13,13 @@ references/*
 logs/*
 !logs/readme
 
-
-# 
+# source code
 */__pycache__/
-erna/db.sqlite3
 erna/*/__pycache__/
 erna/*/*/__pycache__/
 erna/*/migrations/
 erna/rna_seq/*/migrations/
-erna/db.sqlite3
+erna/*.sqlite3
 pipelines/*/__pycache__/
 pipelines/*/*/__pycache__/
 rna_seq/models/constants/__pycache__/
@@ -28,7 +28,5 @@ rna_seq/models/constants/__pycache__/
 # 
 .ctab/
 .ipynb_checkpoints/
-.err.log
-_.err.log
-_.out.log
-Untitled.ipynb
+_.*.log
+erna/_.*.log
