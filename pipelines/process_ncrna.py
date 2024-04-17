@@ -13,8 +13,8 @@ from rna_seq.models import RNA
 class ProcessNCRNA:
 
     def __init__(self, overwrite:bool=None):
-        self.ref_dir = getattr(settings, 'REFERENCES_DIR')
         self.overwrite = overwrite
+        self.ref_dir = getattr(settings, 'REFERENCES_DIR')
         # records indexed by specie
         self.data = {}
         self.annot = {}

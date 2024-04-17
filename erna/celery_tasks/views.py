@@ -15,6 +15,7 @@ def _return(task_id, *args, **kwargs):
 
 def ExecuteTasksView(request):
   project_id = request.GET.get('project_id', '')
+  print('########', project_id)
   task_id = execute_tasks.delay(project_id)
   return _return(task_id)
 

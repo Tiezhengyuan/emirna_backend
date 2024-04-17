@@ -10,13 +10,13 @@ from typing import Iterable
 
 from rna_seq.models import Genome, Specie, Annotation, MolecularAnnotation
 
-
 class ProcessGenome:
 
-  def __init__(self, data_source=None, specie=None, version=None, overwrite:bool=None):
+  def __init__(self, data_source, overwrite:bool=None):
+    '''
+    args: data_source: NCBI/
+    '''
     self.data_source = data_source
-    self.specie = specie
-    self.version = version
     self.overwrite = True if overwrite else False
     self.ref_dir = getattr(settings, 'REFERENCES_DIR')
 
@@ -31,7 +31,7 @@ class ProcessGenome:
     # Note: the loarding order matters
     res = {}
     for anatomy, obj_iter in self.scan_meta_json(output_dir):
-      meta = self.load_specie_genome(obj_iter)
+      meta = self.load_genome_summary(obj_iter)
       res[anatomy] = meta
     return res
 
@@ -42,7 +42,7 @@ class ProcessGenome:
         obj_iter = HandleJson(json_file).read_json()
         yield (antonomy, obj_iter)
 
-  def load_specie_genome(self, obj_iter:Iterable):
+  def load_genome_summary(self, obj_iter:Iterable):
     '''
     work on model Specie
     1. load anatomy from assembly_summary
@@ -80,14 +80,14 @@ class ProcessGenome:
     }
     return meta
   
-  def download_genome(self):
+  def load_genome(self, specie, version):
     '''
     1- Download genome DNA sequences and annotations
     2. update Genome
     Note: It is supposed that genome metadata has been in Genome.
     '''
     # get genome object
-    genome = Genome.objects.get_genome(self.data_source, self.specie, self.version)
+    genome = Genome.objects.get_genome(self.data_source, specie, version)
     if not genome:
       return None
 
@@ -96,8 +96,7 @@ class ProcessGenome:
     if self.data_source == "NCBI":
       conn = NCBI(self.ref_dir, self.overwrite)
       local_path, local_files = conn.download_genome(
-        genome.ftp_path, self.specie, self.version
-      )
+        genome.ftp_path, specie, version)
 
     # update database
     if local_files:
@@ -120,6 +119,7 @@ class ProcessGenome:
       local_files = [os.path.join(genome.local_path, name) for \
         name in os.listdir(genome.local_path)]
       outdir = os.path.join(genome.local_path, 'features')
+      print(f"genome annoations by molecular are stored into {outdir}")
       Dir(outdir).init_dir()
 
       # process genome annotations

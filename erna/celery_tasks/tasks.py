@@ -21,6 +21,7 @@ celery tasks
 '''
 @shared_task
 def execute_tasks(project_id):
+  print('########', project_id)
   from pipelines import ExecuteTasks
   # pass celery task id to django
   celery_task_id = current_task.request.get('id')

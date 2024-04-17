@@ -17,6 +17,7 @@ DEBUG = os.environ.get('DEBUG')
 
 # Access hosts
 ALLOWED_HOSTS = [
+    '172.26.0.2',
     'localhost',
     '127.0.0.1', 
     # host name defined in nginx conf
@@ -29,7 +30,6 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:8080',
     'http://127.0.0.1:8080',
-    # 'http://app',
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -64,7 +64,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 #celery settings
-CELERY_BROKER_URL="redis://127.0.0.1:6379"
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+CELERY_BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_EXTENDED = True
 CELERY_ACCEPT_CONTENT = ['application/json']

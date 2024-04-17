@@ -3,11 +3,10 @@ initialize models
 example:
     python3 erna/manage.py shell < erna/scripts/init_erna.py
 '''
-# import sys
-# print(sys.path)
-from rna_seq.models import Method, Tool, MethodTool, MethodRelation, Pipeline
+from rna_seq.models import Method, Tool, MethodTool, \
+    MethodRelation, Pipeline, Project
 
-steps = "1-10".split('-')
+steps = "6".split('-')
 start, end = int(steps[0]), int(steps[-1])
 
 print('\n\n###Begin to refresh/update database###\n\n')
@@ -40,4 +39,8 @@ for enter in range(start, end+1):
         ]
         Pipeline.objects.filter(pipeline_name='miRNA-Seq').delete()
         steps = Pipeline.objects.load_pipeline('miRNA-Seq', mirna_seq)
+    
+    if enter == 6:
+        print("Unlock all locked projects")
+        Project.objects.filter(status='locked').update(status='ready')
 

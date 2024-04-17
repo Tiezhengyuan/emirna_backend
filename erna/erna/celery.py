@@ -1,5 +1,6 @@
 import os
 import sys
+from django.conf import settings
 from celery import Celery
 from celery.signals import setup_logging, after_setup_task_logger, task_prerun, task_postrun
 from celery.app.log import TaskFormatter
@@ -14,7 +15,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'erna.settings')
 app = Celery('erna');
 app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()
-
 
 
 @app.task(bind=True)
@@ -40,7 +40,8 @@ def debug_task(self):
 @task_prerun.connect
 def overload_task_logger(task_id, task, args, **kwargs):
   logger = logging.getLogger("celery.task")
-  file_handler = logging.FileHandler(f'/home/yuan/bio/emirna_backend/logs/{task_id}.log')
+  file_handler = logging.FileHandler(f'{settings.LOGS_DIR}/{task_id}.log')
+  print(f'@@{settings.LOGS_DIR}/{task_id}.log')
   file_handler.setLevel(logging.INFO)
   tf = TaskFormatter("%(asctime)s | %(levelname)s | %(processName)s | %(task_name)s | %(task_id)s | %(message)s")
   file_handler.setFormatter(tf)
@@ -49,7 +50,8 @@ def overload_task_logger(task_id, task, args, **kwargs):
 @task_postrun.connect
 def cleanup_logger(task_id, task, args, **kwargs):
   logger = logging.getLogger("celery.task")
-  log_path = f'/home/yuan/bio/emirna_backend/logs/{task_id}.log'
+  log_path = f'{settings.LOGS_DIR}/{task_id}.log'
+  print(f'@@@@{settings.LOGS_DIR}/{task_id}.log')
   for handler in logger.handlers:
     if isinstance(handler, logging.FileHandler) and handler.baseFilename == log_path:
       logger.removeHandler(handler)
